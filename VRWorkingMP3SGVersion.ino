@@ -154,16 +154,16 @@ void folderControl (uint8_t folder, uint8_t songNumber) {
 void send_cmd (uint8_t *cmd) {
 // find checksum
   uint8_t checksum = 0;
-  for (int i=2; i<7; i++) { //add 2,3,4,5,6 (remeber array starts at ZERO)
+  for (int i=2; i<7; i++) { //add 2,3,4,5,6 (remember array starts at ZERO)
     checksum += cmd[i];
     }
-	checksum = (255 - checksum)+2;
+  checksum = (255 - checksum)+2;
   // insert into bit 8 of _cmd
   cmd[8] = (uint8_t)checksum;
-	// send to MP3
+  // send to MP3
   for (int i=0; i<10; i++) { //send cmd
-		(Serial1).write (cmd[i]);
-	  }
+	(Serial1).write (cmd[i]);
+	}
   }
 
 void triggerStage() {
