@@ -10,6 +10,9 @@ Speaker (8 ohm)
 
 This is a system I'm developing for fun, it accepts voice commands then plays music (mp3 files)
 I'm using: 
+
 DSpotterSDK_MakerHL.h
+
 NeoPixelConnect.h
+
 I've written my own commands for the MP3 player as the library is too slow and does not offer the commands I'd like to use. 
