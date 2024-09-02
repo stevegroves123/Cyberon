@@ -37,7 +37,7 @@ NeoPixelConnect p(PIN, MAXIMUM_NUM_NEOPIXELS, pio1, 0);  //State Machine set to 
 
 int folder = 1;
 int songNumber = 1;
-int volume = 5;
+int volume = 10;
 
 void setup() {
   // Init Serial output for show debug info
@@ -54,13 +54,20 @@ void setup() {
   send_cmd(setSD_cmd);
   delay(150);
 
-  //set volume to 5
+  //set volume to (int volume)
   volumeControl(volume);
+  static uint8_t volume_cmd [] = { 0X7E, 0xFF, 0x06, 0x43, 0x00, 0x00, 0x00, 0xFE, 0x00, 0XEF};
+  volume_cmd[6] = (uint8_t)(volume);
+  send_cmd(volume_cmd);
+  delay(150);
 
+/*
   // set for first song in first folder
   folderControl(folder, songNumber);
+  delay(150);
   stopMusic();
-
+  delay(150);
+*/
   // Init VR engine & Audio
   if (g_oDSpotterSDKHL.Init(DSPOTTER_LICENSE, sizeof(DSPOTTER_LICENSE), DSPOTTER_MODEL, VRCallback) != DSpotterSDKHL::Success)
     return;
@@ -74,10 +81,10 @@ void loop() {
 
 void playMusic() {
   p.neoPixelFill(0, 0, 0, false);
+  p.neoPixelFill(5, 5, 150, true);  
   static uint8_t play_cmd [] = { 0X7E, 0xFF, 0x06, 0X0D, 0x00, 0x00, 0x00, 0xFE, 0x00, 0XEF}; 
   send_cmd(play_cmd);
-  p.neoPixelSetValue(songNumber, 0, 0, 255, true);
-  songNumber += 1;
+  delay(150);
 }
 
 void stopMusic() {
@@ -88,40 +95,46 @@ void stopMusic() {
 }
 
 void previousMusic() {
+  songNumber -= 1;
   p.neoPixelFill(0, 0, 0, false);
   p.neoPixelSetValue(songNumber, 0, 0, 150, true);
-  //myDFPlayer.previous();
-  songNumber -= 1;
+  static uint8_t next_cmd [] = { 0X7E, 0xFF, 0x06, 0x02, 0x00, 0x00, 0x00, 0xFE, 0xF9, 0XEF};
+  send_cmd(next_cmd);
+  delay(150);
 }
 
 void nextMusic() {
+  songNumber += 1;
   p.neoPixelFill(0, 0, 0, false);
   p.neoPixelSetValue(songNumber, 0, 0, 150, true);
-  static uint8_t next_cmd [] = { 0X7E, 0xFF, 0x06, 0x01, 0x00, 0x00, 0x00, 0xFE, 0xFA, 0XEF};
- // next_cmd[6] = (uint8_t)(songNumber);
+  static uint8_t next_cmd [] = { 0X7E, 0xFF, 0x06, 0x01, 0x00, 0x00, 0x00, 0xFE, 0x00, 0XEF};
   send_cmd(next_cmd);
-  //myDFPlayer.next();
-  songNumber += 1;
+  delay(150);
 }
 
-void volumeUp() {
-  volume += 2;
+void volumeUp(uint8_t volume) {
+  volume = volume + 1;
+  p.neoPixelFill(0, 0, 0, false);
   p.neoPixelSetValue(volume, 0, 100, 0, true);
-  //myDFPlayer.volume(volume);
+  static uint8_t volumeUp_cmd [] = { 0X7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x00, 0xFE, 0xF00, 0XEF};
+  volumeUp_cmd[6] = (uint8_t)(volume);
+  send_cmd(volumeUp_cmd);
+  delay(150);
 }
 
-void volumeDown() {
-  volume -= 2;
+void volumeDown(uint8_t volume) {
+  volume = volume - 1;
+  p.neoPixelFill(0, 0, 0, false);
   p.neoPixelSetValue(volume, 0, 100, 0, true);
-  //myDFPlayer.volume(volume);
-}
-
-void nextFolder() {
-  //folder +=1;
-  //myDFPlayer.playFolder(1, 1);
+  static uint8_t volumeDown_cmd [] = { 0X7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x00, 0xFE, 0xF00, 0XEF};
+  volumeDown_cmd[6] = (uint8_t)(volume);
+  send_cmd(volumeDown_cmd);
+  delay(150);
 }
 
 void volumeControl (uint8_t volume) {
+  p.neoPixelFill(0, 0, 0, false);
+  p.neoPixelSetValue(volume, 0, 100, 0, true);
   static uint8_t volume_cmd [] = { 0X7E, 0xFF, 0x06, 0X06, 0x00, 0x00, 0x00, 0xFE, 0x00, 0XEF};
   volume_cmd[6] = (uint8_t)(volume);
   send_cmd(volume_cmd);
@@ -168,12 +181,10 @@ void VRCallback(int nFlag, int nID, int nScore, int nSG, int nEnergy) {
   } else if (nFlag == DSpotterSDKHL::GetResult) {
     switch (nID) {
       case opencamera:
-        //volumeUp();
-        nextFolder();
-        //fireworks();
+        volumeUp(volume);
         break;
       case takepicture:
-        volumeDown();
+        volumeDown(volume);
         break;
       case playmusic:
         playMusic();
