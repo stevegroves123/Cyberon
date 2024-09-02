@@ -3,9 +3,13 @@ Voice activated music player
 
 Development of a system
 Parts:
+
 Arduino Nano Connect PR2040
+
 DFRobot Mini MP3 player + 4Gbyte SD card
+
 NeoPixel Ring (12 Pixels)
+
 Speaker (8 ohm)
 
 This is a system I'm developing for fun, it accepts voice commands then plays music (mp3 files)
