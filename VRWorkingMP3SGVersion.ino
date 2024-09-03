@@ -10,7 +10,7 @@ UART drive Mini MP3 player
 #include <DSpotterSDK_MakerHL.h>
 #include <NeoPixelConnect.h>
 
-#define PIN 25
+#define NeoPIN 25
 #define MAXIMUM_NUM_NEOPIXELS 12
 #define S1RX 0  // Serial1 RX
 #define S1TX 1  // Serial1 TX
@@ -33,7 +33,7 @@ UART drive Mini MP3 player
 // The VR engine object. Only can exist one, otherwise not worked.
 static DSpotterSDKHL g_oDSpotterSDKHL;
 
-NeoPixelConnect p(PIN, MAXIMUM_NUM_NEOPIXELS, pio1, 0);  //State Machine set to 1
+NeoPixelConnect p(NeoPIN, MAXIMUM_NUM_NEOPIXELS, pio1, 0);  //State Machine set to 1
 
 int folder = 1;
 int songNumber = 1;
@@ -48,7 +48,14 @@ void setup() {
 
   // Start serial connection to MP3 mini
   Serial1.begin(9600, S1RX, S1TX);
-
+  while (!Serial1) {
+	for (int loop = 0; loop <10; loop++) {
+		p.neoPixelFill(0, 0, 0, true);
+		delay(500);
+		p.neoPixelFill(0, 200, 0, true);
+		delay(500);
+	}
+  }
   // use SD card
   static uint8_t setSD_cmd [] = { 0X7E, 0xFF, 0x06, 0x3F, 0x00, 0x00, 0x02, 0xFE, 0xAC, 0XEF}; 
   send_cmd(setSD_cmd);
